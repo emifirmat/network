@@ -1,0 +1,27 @@
+{% extends "network/index.html" %}
+
+{% block title %}Profile{% endblock title %}
+
+{% block body_header %}
+
+    <div>
+        <h3><span id="profile-name">{{ profile_user }}</span>'s Profile</h3>
+        {% if user.is_authenticated and user != profile_user %}
+            <button class="btn" id="follow" name="follow" value="{{ profile_user.id }}">
+                {% if profile_user.is_following == True %}
+                    Unfollow
+                {% else %}
+                    Follow
+                {% endif %}
+            </button>
+        {% endif %}
+    </div>
+    <div> 
+        <p class="follow-text">
+            <b>Followers: </b><span id="followersCount">
+            {{ profile_user.followers_list.count }}</span><b> | Following: </b>
+            <span id="followingCount">{{ profile_user.following_list.count }}</span>
+        </p>
+    </div>
+
+{% endblock body_header %}

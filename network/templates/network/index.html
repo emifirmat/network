@@ -1,0 +1,95 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+    
+    <div id="post-message"></div>
+
+    {% block body_header %}
+
+        <h3>All Posts</h3>
+        {% if user.is_authenticated %}
+            <div id="new_post" class="container mb-4 py-2">
+                <h4>New Post:</h4>
+                <form href="" method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input class="btn" type="submit" value="Post">
+                </form>
+            </div>
+        {% endif %}
+
+    {% endblock body_header %}
+    {% block body_posts %}
+    
+        {% for post in posts %} 
+            <div class="card mb-3 border border-dark rounded" data-postid="{{ post.id }}">
+                <div class="card-header pt-2">
+                    <div class="row">
+                        <div class="col">
+                            <a href="{% url 'network:profile' post.creator.id %}">
+                                {{ post.creator }}
+                            </a>                       
+                            <small>{{ post.created_at }}</small>
+                        </div>
+                    {% if user.is_authenticated and user == post.creator %}
+                        <div class="col text-right">
+                            <a class="editPost" id="edit-{{ post.id }}" href="#">
+                                Edit
+                            </a>
+                        </div>
+                    {% endif %}
+                    </div>
+                </div>
+                <div class="card-body" id="post-{{ post.id }}">
+                    <p id="content-{{ post.id }}">{{ post.content }}</p>
+                    <div id="form-{{ post.id }}"></div>
+                </div>
+                <div class="card-body like-container">
+                    <span class="mr-1" id="like-{{ post.id }}">
+                        ❤️{{ post.post_likes.count }}
+                    </span>
+                    {% if user.is_authenticated %}
+                            {% if post.id in liked_posts %}
+                                <img class="like" src="{% static 'network/dislike.svg' %}" alt="Unlike"> 
+                                <span class="ml-auto position-relative">Unlike</span>
+                            {% else %}
+                                <img class="like" src="{% static 'network/like.svg' %}" alt="Like">
+                                <span class="ml-auto position-relative">Like</span>
+                            {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p>No posts have been made yet.</p>
+        {% endfor%}
+            <div class="pagination">
+                <span class="step-links">
+                    {% if posts.has_previous %}
+                        <a id="first" href="?page=1">&laquo; first</a>
+                        <a id="previous" href="?page={{ posts.previous_page_number }}">
+                            previous
+                        </a>
+                    {% endif %}
+                    <span class="current">
+                        Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+                    </span>
+                    {% if posts.has_next %}
+                        <a id="next" href="?page={{ posts.next_page_number }}">
+                            next
+                        </a>
+                        <a id="last" href="?page={{ posts.paginator.num_pages }}">
+                            last &raquo;
+                        </a>
+                    {% endif %}
+                </span>
+            </div>
+
+    {% endblock body_posts %}
+    
+{% endblock %}
+{% block script %}
+
+    <script src="{% static 'network/index.js' %}"></script>
+
+{% endblock script %}
